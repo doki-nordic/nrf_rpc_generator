@@ -1,12 +1,95 @@
-const { readFileSync } = require('fs');
+const { readFileSync, writeFileSync } = require('fs');
 const { StringDecoder } = require('string_decoder');
 const { execSync } = require('child_process');
+const { SourceFragments } = require('./lib/SourceFragments');
+const CodeBlocks = require('./lib/CodeBlocks');
+const crypto = require('crypto');
+const { filterRecursive, findRecursive } = require('./lib/Utils');
+const NoiselessTags = require('./lib/NoiselessTags');
+const hash = crypto.createHash('sha256');
 
+const pe = process.exit;
 
-let json = new StringDecoder().write(execSync('/dk/apps/clang/bin/clang -Xclang -ast-dump=json -fsyntax-only -include rp_ser_gen_intern.h api.c'));
+let json;
+
+try {
+	json = new StringDecoder().write(execSync('/dk/apps/clang/bin/clang -Xclang -ast-dump=json -fsyntax-only -include rp_ser_gen_intern.h api_cli.c'));
+} catch (ex) {
+	if ('stdout' in ex && ex.stdout.length > 0) {
+		json = new StringDecoder().write(ex.stdout);
+	} else {
+		console.log(ex);
+		process.exit(1);
+	}
+}
+
+writeFileSync('api.json', json);
 
 let ast = JSON.parse(json);
-let src = readFileSync('api.c', 'utf-8');
+let src = new SourceFragments('api_cli.c');
+
+let list = filterRecursive(ast, item => (
+	item.kind == 'FunctionDecl' &&
+	findRecursive(item.inner, inner => (
+		inner.kind == 'CompoundStmt' &&
+		findRecursive(item.inner, inner2 => (
+			inner2.kind == 'StringLiteral' &&
+			inner2.value.startsWith('"__SERIALIZE__:')
+		))
+	))
+));
+
+
+for (let func of list) {
+	console.log(func);
+	let body = findRecursive(func, inner => (
+		inner.kind == 'CompoundStmt'
+	));
+	console.log(src.substring(body.range.begin.offset, body.range.end.offset + 1));
+	let x = src.substring(body.range.begin.offset, body.range.end.offset + 1);
+	let begin = x.match(/^\{[ \t\r]*\n?/);
+	let end = x.match(/[\t ]*\}$/);
+	if (begin === null || end == null) {
+		throw Error(`Cannot parse body of '${func.name}' function.`);
+	}
+	let fragment = src.create(body.range.begin.offset + begin[0].length, body.range.end.offset + 1 - end[0].length);
+	console.log(NoiselessTags.extract(fragment.text));
+}
+
+for (let i = 0; i < src.frags.length; i++) {
+	//	if (src.frags[i].mutable) console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+	///	console.log(src.frags[i].text);
+	//	if (src.frags[i].mutable) console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+}
+
+setTimeout(() => { }, 100000);
+
+/*
+function showNode(node, ind) {
+	ind = ind || '';
+
+	if (node instanceof Array) {
+		for (let item of node) {
+			showNode(item, ind);
+		}
+		return;
+	}
+
+	if ('id' in node && 'kind' in node) {
+		console.log(`${node.id}${ind}  ${node.kind}       ${JSON.stringify(node)}`);
+	}
+
+	for (let n in node) {
+		let item = node[n];
+		if (typeof (item) == 'object') {
+			showNode(item, ind + '    ');
+		}
+	}
+}
+
+showNode(ast);
+
+/*
 
 function resolveLocationsInner(obj, lineMap, current)
 {
@@ -54,30 +137,31 @@ function resolveLocations(ast, src)
 
 resolveLocations(ast, src);
 
-function* findRecursive(obj, condition) {
+function* findRecursiveAll(obj, condition) {
 	if (condition(obj)) yield obj;
 	if (typeof (obj) != 'object') return;
 	if (obj instanceof Array) {
 		for (let item of obj) {
-			for (let x of findRecursive(item, condition)) yield x;
+			for (let x of findRecursiveAll(item, condition)) yield x;
 		}
 	} else {
 		for (let key in obj) {
-			for (let x of findRecursive(obj[key], condition)) yield x;
+			for (let x of findRecursiveAll(obj[key], condition)) yield x;
 		}
 	}
 }
 
-function findRecursiveFirst(obj, condition) {
-	for (let x of findRecursive(obj, condition)) {
-		return x;
+function findRecursive(obj, condition) {
+	let r = null;
+	for (let x of findRecursiveAll(obj, condition)) {
+		r = x;
 	}
-	return null;
+	return r;
 }
 
 function* findSerializeDirectives(decl)
 {
-	let items = findRecursive(decl, (item) => (typeof(item) == 'object'
+	let items = findRecursiveAll(decl, (item) => (typeof(item) == 'object'
 		&& item.kind == 'StringLiteral'
 		&& item.value.startsWith('"SERIALIZE:')));
 	for (let item of items) {
@@ -126,3 +210,5 @@ for (let decl of ast.inner) {
 console.log(ast);
 
 setTimeout(() => { }, 10000000);
+
+*/

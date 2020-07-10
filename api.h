@@ -2,6 +2,7 @@
 
 int func(int x);
 
+
 /*
 //#include "nonex.h"
 
