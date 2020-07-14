@@ -3,15 +3,16 @@
 
 #define _SERIALIZE__CONCAT2(a, b, c) a ## _ ## b ## _ ## c
 #define _SERIALIZE__CONCAT(a, b, c) _SERIALIZE__CONCAT2(a, b, c)
-#define _SERIALIZE__UNIQUE() _SERIALIZE__CONCAT(_serialize_unique, __COUNTER__, __LINE__)
+#define _SERIALIZE__UNIQUE() _SERIALIZE__CONCAT(_serialize_unique_, __COUNTER__, __LINE__)
 
 #define _SERIALIZE_ "__SERIALIZE__:USE"
 #define _SERIALIZE_OUT(x) "__SERIALIZE__:OUT=" #x
 #define _SERIALIZE_INOUT(x) "__SERIALIZE__:INOUT=" #x
 #define _SERIALIZE_ARRAY_SIZE(x) "__SERIALIZE__:ARRAY_SIZE=" #x
 
-#define _SERIALIZE_HOST_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:HOST_FILE=" file
-#define _SERIALIZE_CLIENT_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CLIENT_FILE=" file
+#define _SERIALIZE_GROUP(group) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
+#define _SERIALIZE_CMD_ID(prefix, postfix) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CMD_ID=" #prefix "$" #postfix
+#define _SERIALIZE_EVT_ID(prefix, postfix) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:EVT_ID=" #prefix "$" #postfix
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
 

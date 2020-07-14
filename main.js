@@ -1,14 +1,15 @@
 const { writeFileSync } = require('fs');
-const Parser = require('./lib/Parser');
+const Parser = require('./lib/Parsing');
 const CodeBlocks = require('./lib/CodeBlocks');
 const NrfRpcCborGenerator = require('./lib/NrfRpcCborGenerator');
 const { findRecursive } = require('./lib/Utils');
+const { parse } = require('path');
 
 setTimeout(() => { }, 2300);
 
 let options = {
-	cliSrc: 'api_cli.c',
-	hostSrc: 'api_host.c',
+	cliSrcPath: 'api_cli.c',
+	hostSrcPath: 'api_host.c',
 	clangPath: '/dk/apps/clang/bin/clang',
 	clangParams: '',
 	clangCliParams: '',
@@ -67,19 +68,19 @@ class Func {
 			}
 		}
 
-		for (let [value] of this.sendFunc.getSerializeMacros('OUT')) {
-			if (!(value in this.params)) {
-				throw new Error(`Input parameter '${value}' not found for SERIALIZE(OUT(...)) in '${this.name}'.`);
+		for (let m of this.sendFunc.getSerializeMacros('OUT')) {
+			if (!(m.value in this.params)) {
+				throw new Error(`Input parameter '${m.value}' not found for SERIALIZE(OUT(...)) in '${this.name}'.`);
 			}
-			this.params[value].dir = OUT;
+			this.params[m.value].dir = OUT;
 			break;
 		}
 
-		for (let [value] of this.sendFunc.getSerializeMacros('INOUT')) {
-			if (!(value in this.params)) {
-				throw new Error(`Input parameter '${value}' not found for SERIALIZE(INOUT(...)) in '${this.name}'.`);
+		for (let m of this.sendFunc.getSerializeMacros('INOUT')) {
+			if (!(m.value in this.params)) {
+				throw new Error(`Input parameter '${m.value}' not found for SERIALIZE(INOUT(...)) in '${this.name}'.`);
 			}
-			this.params[value].dir = INOUT;
+			this.params[m.value].dir = INOUT;
 			break;
 		}
 
@@ -88,9 +89,8 @@ class Func {
 
 	generate() {
 
-		let g = new NrfRpcCborGenerator.Func(this);
-
-		g.generate();
+		let blocks = NrfRpcCborGenerator.generateCliSendFunc(this);
+		this.sendFunc.regenerate(blocks);
 
 	}
 
@@ -136,18 +136,12 @@ ${declaration}
 const FUNCTION_RESPONSE_POSTFIX = '_rpc_response';
 const FUNCTION_HANDLER_POSTFIX = '_rpc_handler';
 
-
-function isSerializable(func) {
-
-	return !!findRecursive(func.node.inner, inner => (
-		inner.kind == 'CompoundStmt' &&
-		findRecursive(inner.inner, inner2 => (
-			inner2.kind == 'StringLiteral' &&
-			inner2.value.startsWith('"__SERIALIZE__:')
-		))
-	));
+let groupMacro = parser.getSerializeMacro('GROUP');
+if (!groupMacro) {
+	throw Error(`Unknown group. Specify group name with the SERIALIZE(GORUP(...)) macro.`);
 }
 
+console.log(groupMacro.value);
 
 for (let name in parser.functions) {
 
@@ -161,7 +155,7 @@ for (let name in parser.functions) {
 	} else if (name.endsWith(FUNCTION_HANDLER_POSTFIX)) {
 		baseName = name.substr(0, name.length - FUNCTION_HANDLER_POSTFIX.length);
 		Class = Func;
-	} else if (isSerializable(func)) {
+	} else if (func.isSerializable()) {
 		baseName = name;
 		Class = Func;
 	} else {
@@ -175,7 +169,7 @@ for (let name in parser.functions) {
 
 }
 
-writeFileSync('api_cli.c', parser.cliFragments.generate());
+writeFileSync('api_cli.c', parser._cliSrc.generate());
 
 
 /*
@@ -184,6 +178,7 @@ FUNCTION
 	client:
 	xyz - encode parameters, send and optionally parse response
 	xyz_rpc_response - (optional) parse response
+	struct xyz_rpc_results - (optional) parsing response results
 
 	host:
 	xyz_rpc_handler - decode parameters, execute, encode response
