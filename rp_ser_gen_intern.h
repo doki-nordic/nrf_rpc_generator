@@ -8,11 +8,19 @@
 #define _SERIALIZE_ "__SERIALIZE__:USE"
 #define _SERIALIZE_OUT(x) "__SERIALIZE__:OUT=" #x
 #define _SERIALIZE_INOUT(x) "__SERIALIZE__:INOUT=" #x
+#define _SERIALIZE_STR(x) "__SERIALIZE__:STR=" #x
 #define _SERIALIZE_ARRAY_SIZE(x) "__SERIALIZE__:ARRAY_SIZE=" #x
+#define _SERIALIZE_INLINE_RESPONSE "__SERIALIZE__:INLINE_RESPONSE"
+#define _SERIALIZE_EVENT "__SERIALIZE__:EVENT"
+#define _SERIALIZE_IGNORE_RETURN "__SERIALIZE__:IGNORE_RETURN"
+
 
 #define _SERIALIZE_GROUP(group) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
 #define _SERIALIZE_CMD_ID(prefix, postfix) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CMD_ID=" #prefix "$" #postfix
 #define _SERIALIZE_EVT_ID(prefix, postfix) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:EVT_ID=" #prefix "$" #postfix
+#define _SERIALIZE_FUNC(name) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FUNC=" #name
+#define _SERIALIZE_CLI_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CLI_FILE=" file
+#define _SERIALIZE_HOST_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:HOST_FILE=" file
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
 
