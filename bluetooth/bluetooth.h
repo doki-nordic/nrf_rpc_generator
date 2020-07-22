@@ -260,7 +260,7 @@ int bt_id_reset(u8_t id, bt_addr_le_t *addr, u8_t *irk);
  *
  *  @return 0 in case of success, or a negative error code on failure.
  */
-int bt_id_delete(u8_t id);
+int bt_id_delete(uint8_t id);
 
 /** @brief Bluetooth data.
  *
