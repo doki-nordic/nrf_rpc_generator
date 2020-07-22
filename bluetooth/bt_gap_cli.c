@@ -224,3 +224,19 @@ int bt_le_whitelist_clear(void)
 	return _result;                                                          /*##BX7TDLc*/
 }
 
+static void bt_le_scan_timeout_rpc_handler(CborValue *_value, void *_handler_data)/*####%BrQA*/
+{                                                                                 /*#####@ZO0*/
+
+	struct nrf_rpc_cbor_ctx _ctx;                                             /*####%ATMv*/
+	size_t _buffer_size_max = 0;                                              /*#####@1d4*/
+
+	nrf_rpc_cbor_decoding_done(_value);                                       /*##AGkSPWY*/
+
+	bt_le_scan_timeout();                                                     /*##DtLGskE*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                               /*##AvrU03s*/
+
+	nrf_rpc_cbor_rsp_no_err(&_ctx);                                           /*##BFLm1vw*/
+
+}                                                                                 /*##B9ELNqo*/
+

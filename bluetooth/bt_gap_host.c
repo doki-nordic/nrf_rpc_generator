@@ -225,7 +225,15 @@ static void bt_le_scan_recv(const struct bt_le_scan_recv_info *info,
 
 static void bt_le_scan_timeout(void)
 {
-	//SERIALIZE();
+	SERIALIZE();
+
+	struct nrf_rpc_cbor_ctx _ctx;                                            /*####%ATMv*/
+	size_t _buffer_size_max = 0;                                             /*#####@1d4*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*##AvrU03s*/
+
+	nrf_rpc_cbor_cmd_no_err(&bt_rpc_grp, BT_LE_SCAN_TIMEOUT_RPC_CMD,         /*####%BIt1*/
+		&_ctx, ser_rsp_simple_void, NULL);                               /*#####@fSA*/
 }
 
 
