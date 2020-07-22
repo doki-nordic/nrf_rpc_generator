@@ -42,8 +42,7 @@ static void bt_enable_rpc_handler(CborValue *_value, void *_handler_data)       
 
 	ser_encode_int(&_ctx.encoder, &_result);                                 /*##DD1pDyU*/
 
-	return;                                                                  /*####%B86L*/
-}                                                                                /*#####@5qc*/
+}                                                                                /*##B9ELNqo*/
 
 static void bt_set_name_rpc_handler(CborValue *_value, void *_handler_data)      /*####%BgLQ*/
 {                                                                                /*#####@EdU*/
@@ -68,6 +67,23 @@ decoding_error:                                                                 
 	report_decoding_error(BT_RPC_GAP_BT_SET_NAME_CMD, _handler_data);        /*#######UH*/
 }                                                                                /*#######@I*/
 
+
+static bool bt_get_name_out(char *name, size_t size)
+{
+	const char *src;
+
+	src = bt_get_name();
+
+	if (src == NULL) {
+		strcpy(name, "");
+		return false;
+	} else {
+		strncpy(name, src, size);
+		return true;
+	}
+}
+
+
 static void bt_get_name_out_rpc_handler(CborValue *_value, void *_handler_data)  /*####%Buty*/
 {                                                                                /*#####@Q0A*/
 
@@ -86,6 +102,9 @@ static void bt_get_name_out_rpc_handler(CborValue *_value, void *_handler_data) 
 	char name[size + 1];                                                     /*##D1X7iow*/
 
 	_result = bt_get_name_out(size, name);                                   /*##Dn/FY8s*/
+
+	_name_strlen = strlen(name);                                             /*####%CFOk*/
+	_buffer_size_max += _name_strlen;                                        /*#####@f8c*/
 
 	ser_encode_bool(&_ctx.encoder, &_result);                                /*####%DGKF*/
 	ser_encode_str(&_ctx.encoder, name, -1);                                 /*#####@raA*/

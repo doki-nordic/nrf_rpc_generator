@@ -110,7 +110,8 @@ static bool bt_get_name_out(char *name, size_t size)
 
 	ser_encode_uint(&_ctx.encoder, size);                                    /*##A2nPHkE*/
 
-	_result.size = size;                                                     /*##C93H5O0*/
+	_result.size = size;                                                     /*####%C5M6*/
+	_result.name = name;                                                     /*#####@4K4*/
 
 	nrf_rpc_cbor_cmd_no_err(&bt_rpc_grp, BT_RPC_GAP_BT_GET_NAME_OUT_CMD,     /*####%BBLa*/
 		&_ctx, bt_get_name_out_rpc_rsp, &_result);                       /*#####@vEg*/
