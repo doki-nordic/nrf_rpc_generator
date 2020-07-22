@@ -428,3 +428,16 @@ void func_decode(CborParser& in, CborEncoder& out)
 }
 
 #endif
+
+static bool check_bt_addr_le_t(uint8_t size, uint8_t offset_type, uint8_t offset_a, uint8_t size_a, uint8_t* types)
+{
+	CHECK(sizeof(bt_addr_le_t) == size);
+	CHECK(offsetof(bt_addr_le_t, type) == offset_type);
+	CHECK(offsetof(bt_addr_le_t, a) == offset_a);
+	CHECK(sizeof(((bt_addr_le_t*) NULL)->a) == size);
+	CHECK(types[0] = BT_ADDR_LE_PUBLIC);
+	CHECK(types[1] = BT_ADDR_LE_RANDOM);
+	CHECK(types[2] = BT_ADDR_LE_PUBLIC_ID);
+	CHECK(types[3] = BT_ADDR_LE_RANDOM_ID);
+}
+

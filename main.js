@@ -1,3 +1,8 @@
+
+if (!('fromEntries' in Object)) {
+	Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ [k]: v })));
+}
+
 const { writeFileSync } = require('fs');
 const Parser = require('./lib/Parsing');
 const CodeBlocks = require('./lib/CodeBlocks');
@@ -6,7 +11,7 @@ const { findRecursive } = require('./lib/Utils');
 const { parse } = require('path');
 const Units = require('./lib/Units')
 
-setTimeout(() => { }, 2300);
+//setTimeout(() => { }, 2300);
 
 let mod = new Units.Module('bluetooth/bt_gap_cli.c');
 mod.execute();
@@ -34,7 +39,7 @@ int *x, int *size
 
 char *str
 	in
-	
+
 
 */
 /*let parser = new Parser.Parser('api_cli.c');

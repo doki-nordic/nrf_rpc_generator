@@ -9,10 +9,14 @@
 #define _SERIALIZE_OUT(x) "__SERIALIZE__:OUT=" #x
 #define _SERIALIZE_INOUT(x) "__SERIALIZE__:INOUT=" #x
 #define _SERIALIZE_STR(x) "__SERIALIZE__:STR=" #x
-#define _SERIALIZE_ARRAY_SIZE(x) "__SERIALIZE__:ARRAY_SIZE=" #x
 #define _SERIALIZE_INLINE_RESPONSE "__SERIALIZE__:INLINE_RESPONSE"
 #define _SERIALIZE_EVENT "__SERIALIZE__:EVENT"
 #define _SERIALIZE_IGNORE_RETURN "__SERIALIZE__:IGNORE_RETURN"
+#define _SERIALIZE_CUSTOM_RESPONSE "__SERIALIZE__:CUSTOM_RESPONSE"
+#define _SERIALIZE_ADD(dir, type, name) "__SERIALIZE__:ADD=" #dir "`" #type "`" #name
+#define _SERIALIZE_SIZE(param, size) "__SERIALIZE__:SIZE=" #param "`" #size
+#define _SERIALIZE_SIZE_PARAM(param, size_param) "__SERIALIZE__:SIZE_PARAM=" #param "`" #size_param
+#define _SERIALIZE_SIZE_PARAM_EX(param, size_pattern, size_param) "__SERIALIZE__:SIZE_PARAM_EX=" #param "`" #size_pattern "`" #size_param
 
 
 #define _SERIALIZE_GROUP(group) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
