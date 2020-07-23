@@ -17,6 +17,7 @@
 #define _SERIALIZE_SIZE(param, size) "__SERIALIZE__:SIZE=" #param "`" #size
 #define _SERIALIZE_SIZE_PARAM(param, size_param) "__SERIALIZE__:SIZE_PARAM=" #param "`" #size_param
 #define _SERIALIZE_SIZE_PARAM_EX(param, size_pattern, size_param) "__SERIALIZE__:SIZE_PARAM_EX=" #param "`" #size_pattern "`" #size_param
+#define _SERIALIZE_NULLABLE(param) "__SERIALIZE__:NULLABLE=" #param
 
 
 #define _SERIALIZE_GROUP(group) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
@@ -25,6 +26,7 @@
 #define _SERIALIZE_FUNC(name) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FUNC=" #name
 #define _SERIALIZE_CLI_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CLI_FILE=" file
 #define _SERIALIZE_HOST_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:HOST_FILE=" file
+#define _SERIALIZE_RAW_STRUCT(type) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:RAW_STRUCT=" #type
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
 
