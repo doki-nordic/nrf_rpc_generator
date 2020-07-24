@@ -85,11 +85,15 @@ static bool bt_get_name_out(char *name, size_t size)
 	SERIALIZE(STR(name));
 	SERIALIZE(SIZE_PARAM(name, size));
 
-	struct nrf_rpc_cbor_ctx _ctx;                                            /*######%Ac*/
-	struct bt_get_name_out_rpc_res _result;                                  /*######WP+*/
-	size_t _buffer_size_max = 5;                                             /*######@64*/
+	struct nrf_rpc_cbor_ctx _ctx;                                            /*######%AY*/
+	struct bt_get_name_out_rpc_res _result;                                  /*#######X2*/
+	size_t _scratchpad_size = 0;                                             /*#######Jd*/
+	size_t _buffer_size_max = 10;                                            /*#######@I*/
 
-	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*##AvrU03s*/
+	_scratchpad_size += SCRATCHPAD_ALIGN(size);                              /*##EB+3ycA*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*####%AoDN*/
+	ser_encode_uint(&_ctx.encoder, _scratchpad_size);                        /*#####@BNc*/
 
 	ser_encode_uint(&_ctx.encoder, size);                                    /*##A2nPHkE*/
 
@@ -235,15 +239,19 @@ int bt_le_set_chan_map(uint8_t chan_map[5])
 {
 	SERIALIZE(SIZE(chan_map, 5));
 
-	struct nrf_rpc_cbor_ctx _ctx;                                            /*######%Af*/
-	size_t _chan_map_size;                                                   /*#######hK*/
-	int _result;                                                             /*#######Kr*/
-	size_t _buffer_size_max = 5;                                             /*#######@Y*/
+	struct nrf_rpc_cbor_ctx _ctx;                                            /*#######%A*/
+	size_t _chan_map_size;                                                   /*#######Sz*/
+	int _result;                                                             /*#######xQ*/
+	size_t _scratchpad_size = 0;                                             /*#######pA*/
+	size_t _buffer_size_max = 10;                                            /*########@*/
 
 	_chan_map_size = sizeof(uint8_t) * 5;                                    /*####%CGlM*/
 	_buffer_size_max += _chan_map_size;                                      /*#####@6lU*/
 
-	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*##AvrU03s*/
+	_scratchpad_size += SCRATCHPAD_ALIGN(_chan_map_size);                    /*##EJHhpZ4*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*####%AoDN*/
+	ser_encode_uint(&_ctx.encoder, _scratchpad_size);                        /*#####@BNc*/
 
 	ser_encode_buffer(&_ctx.encoder, chan_map, _chan_map_size);              /*##A4qUuxk*/
 
@@ -343,11 +351,15 @@ void bt_id_get(bt_addr_le_t *addrs, size_t *count)
 	SERIALIZE(SIZE_PARAM_EX(addrs, *$, count));
 	SERIALIZE(INOUT(count));
 
-	struct nrf_rpc_cbor_ctx _ctx;                                            /*######%Aa*/
-	struct bt_id_get_rpc_res _result;                                        /*######AE2*/
-	size_t _buffer_size_max = 5;                                             /*######@f0*/
+	struct nrf_rpc_cbor_ctx _ctx;                                            /*######%AU*/
+	struct bt_id_get_rpc_res _result;                                        /*#######FC*/
+	size_t _scratchpad_size = 0;                                             /*#######Cq*/
+	size_t _buffer_size_max = 10;                                            /*#######@o*/
 
-	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*##AvrU03s*/
+	_scratchpad_size += SCRATCHPAD_ALIGN(*count * sizeof(bt_addr_le_t));     /*##EM0RMfw*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*####%AoDN*/
+	ser_encode_uint(&_ctx.encoder, _scratchpad_size);                        /*#####@BNc*/
 
 	ser_encode_uint(&_ctx.encoder, *count);                                  /*##A0IY0+8*/
 
@@ -359,11 +371,35 @@ void bt_id_get(bt_addr_le_t *addrs, size_t *count)
 }
 
 
+uint8_t generate_addr_irk_flags(bt_addr_le_t *addr, uint8_t *irk)
+{
+	uint8_t flags = 0;
+
+	if (irk) {
+		for (int i = 0; i < 16; i++) {
+			if (irk[i] != 0) {
+				flags |= 1;
+				break;
+			}
+		}
+	}
+
+	if (addr) {
+		static const bt_addr_le_t any = BT_ADDR_LE_ANY;
+		if (memcmp(&any, addr) != 0) {
+			flags |= 2;
+		}
+	}
+
+	return flags;
+}
+
 struct bt_id_create_rpc_res                                                      /*####%BoIG*/
 {                                                                                /*#####@PlM*/
 
-	int _result;                                                             /*####%CZCW*/
-	bt_addr_le_t * addr;                                                     /*#####@VRk*/
+	int _result;                                                             /*######%CT*/
+	bt_addr_le_t * addr;                                                     /*######Jyh*/
+	uint8_t * irk;                                                           /*######@+s*/
 
 };                                                                               /*##B985gv0*/
 
@@ -373,8 +409,9 @@ static void bt_id_create_rpc_rsp(CborValue *_value, void *_handler_data)        
 	struct entropy_get_result *_res =                                        /*####%AWX7*/
 		(struct bt_id_create_rpc_res *)_handler_data;                    /*#####@L6A*/
 
-	_res->_result = ser_decode_int(_value);                                  /*####%DfP8*/
-	ser_decode_buffer(_value, _res->addr, sizeof(bt_addr_le_t));             /*#####@JwU*/
+	_res->_result = ser_decode_int(_value);                                  /*######%DQ*/
+	ser_decode_buffer(_value, _res->addr, sizeof(bt_addr_le_t));             /*######lk5*/
+	ser_decode_buffer(_value, _res->irk, sizeof(uint8_t) * 16);              /*######@5o*/
 
 }                                                                                /*##B9ELNqo*/
 
@@ -386,24 +423,95 @@ int bt_id_create(bt_addr_le_t *addr, uint8_t *irk)
 	SERIALIZE(INOUT(irk));
 	SERIALIZE(SIZE(irk, 16));
 
-	struct nrf_rpc_cbor_ctx _ctx;                                            /*######%AX*/
-	size_t _irk_size;                                                        /*#######sg*/
-	struct bt_id_create_rpc_res _result;                                     /*#######gW*/
-	size_t _buffer_size_max = 8;                                             /*#######@g*/
+	struct nrf_rpc_cbor_ctx _ctx;                                            /*#######%A*/
+	size_t _irk_size;                                                        /*#######Xr*/
+	struct bt_id_create_rpc_res _result;                                     /*#######Lm*/
+	size_t _scratchpad_size = 0;                                             /*#######Ak*/
+	size_t _buffer_size_max = 13;                                            /*########@*/
+
+	size_t i;
 
 	_buffer_size_max += addr ? sizeof(bt_addr_le_t) : 0;                     /*######%CB*/
 	_irk_size = !irk ? 0 : sizeof(uint8_t) * 16;                             /*######cKg*/
 	_buffer_size_max += _irk_size;                                           /*######@u4*/
 
-	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*##AvrU03s*/
+	_buffer_size_max += 1;
+
+	_scratchpad_size += SCRATCHPAD_ALIGN(_irk_size);                         /*##ELqQtKI*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*####%AoDN*/
+	ser_encode_uint(&_ctx.encoder, _scratchpad_size);                        /*#####@BNc*/
 
 	ser_encode_buffer(&_ctx.encoder, addr, sizeof(bt_addr_le_t));            /*####%Ax4U*/
 	ser_encode_buffer(&_ctx.encoder, irk, _irk_size);                        /*#####@/YU*/
 
-	_result.addr = addr;                                                     /*##C3EHO0A*/
+	ser_encode_uint(generate_addr_irk_flags(addr, irk));
+
+	_result.addr = addr;                                                     /*####%CxTc*/
+	_result.irk = irk;                                                       /*#####@QsM*/
 
 	nrf_rpc_cbor_cmd_no_err(&bt_rpc_grp, BT_ID_CREATE_RPC_CMD,               /*####%BMH+*/
 		&_ctx, bt_id_create_rpc_rsp, &_result);                          /*#####@log*/
+
+	return _result._result;                                                  /*##BW0ge3U*/
+}
+
+
+struct bt_id_reset_rpc_res                                                       /*####%Bs1i*/
+{                                                                                /*#####@i/M*/
+
+	int _result;                                                             /*######%CT*/
+	bt_addr_le_t * addr;                                                     /*######Jyh*/
+	uint8_t * irk;                                                           /*######@+s*/
+
+};                                                                               /*##B985gv0*/
+
+static void bt_id_reset_rpc_rsp(CborValue *_value, void *_handler_data)          /*####%BoSY*/
+{                                                                                /*#####@/xk*/
+
+	struct entropy_get_result *_res =                                        /*####%AYXk*/
+		(struct bt_id_reset_rpc_res *)_handler_data;                     /*#####@RoU*/
+
+	_res->_result = ser_decode_int(_value);                                  /*######%DQ*/
+	ser_decode_buffer(_value, _res->addr, sizeof(bt_addr_le_t));             /*######lk5*/
+	ser_decode_buffer(_value, _res->irk, sizeof(uint8_t) * 16);              /*######@5o*/
+
+}                                                                                /*##B9ELNqo*/
+
+int bt_id_reset(u8_t id, bt_addr_le_t *addr, uint8_t *irk)
+{
+	SERIALIZE(INOUT(addr));
+	SERIALIZE(NULLABLE(addr));
+	SERIALIZE(INOUT(irk));
+	SERIALIZE(NULLABLE(irk));
+	SERIALIZE(SIZE(irk, 16));
+
+	struct nrf_rpc_cbor_ctx _ctx;                                            /*#######%A*/
+	size_t _irk_size;                                                        /*#######VA*/
+	struct bt_id_reset_rpc_res _result;                                      /*#######80*/
+	size_t _scratchpad_size = 0;                                             /*#######ao*/
+	size_t _buffer_size_max = 18;                                            /*########@*/
+
+	_buffer_size_max += addr ? sizeof(bt_addr_le_t) : 0;                     /*######%CB*/
+	_irk_size = !irk ? 0 : sizeof(uint8_t) * 16;                             /*######cKg*/
+	_buffer_size_max += _irk_size;                                           /*######@u4*/
+
+	_scratchpad_size += SCRATCHPAD_ALIGN(_irk_size);                         /*##ELqQtKI*/
+
+	NRF_RPC_CBOR_ALLOC(_ctx, _buffer_size_max);                              /*####%AoDN*/
+	ser_encode_uint(&_ctx.encoder, _scratchpad_size);                        /*#####@BNc*/
+
+	ser_encode_int(&_ctx.encoder, id);                                       /*######%Aw*/
+	ser_encode_buffer(&_ctx.encoder, addr, sizeof(bt_addr_le_t));            /*######bYz*/
+	ser_encode_buffer(&_ctx.encoder, irk, _irk_size);                        /*######@+4*/
+
+	ser_encode_uint(generate_addr_irk_flags(addr, irk));
+
+	_result.addr = addr;                                                     /*####%CxTc*/
+	_result.irk = irk;                                                       /*#####@QsM*/
+
+	nrf_rpc_cbor_cmd_no_err(&bt_rpc_grp, BT_ID_RESET_RPC_CMD,                /*####%BDbH*/
+		&_ctx, bt_id_reset_rpc_rsp, &_result);                           /*#####@DeY*/
 
 	return _result._result;                                                  /*##BW0ge3U*/
 }
