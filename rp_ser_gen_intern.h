@@ -27,6 +27,7 @@
 #define _SERIALIZE_CLI_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CLI_FILE=" file
 #define _SERIALIZE_HOST_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:HOST_FILE=" file
 #define _SERIALIZE_RAW_STRUCT(type) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:RAW_STRUCT=" #type
+#define _SERIALIZE_STRUCT(type) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:STRUCT=" #type
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
 

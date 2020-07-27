@@ -515,3 +515,81 @@ int bt_id_reset(u8_t id, bt_addr_le_t *addr, uint8_t *irk)
 
 	return _result._result;                                                  /*##BW0ge3U*/
 }
+
+
+size_t bt_le_adv_param_sp_size(struct bt_le_adv_param *_data)                         /*####%Bhf3*/
+{                                                                                     /*#####@LEI*/
+
+	size_t _scratchpad_size = 0;                                                  /*##ATz5YrA*/
+
+	_scratchpad_size += !_data->peer ? 0 : SCRATCHPAD_ALIGN(sizeof(bt_addr_le_t));/*##EL1Agek*/
+
+	return _scratchpad_size;                                                      /*##BRWAmyU*/
+
+}                                                                                     /*##B9ELNqo*/
+
+size_t bt_le_adv_param_buf_size(struct bt_le_adv_param *_data)                   /*####%BvWP*/
+{                                                                                /*#####@qjc*/
+
+	size_t _buffer_size_max = 0;                                             /*##AW2oACE*/
+
+	_buffer_size_max += !_data->peer ? 0 : 2 + sizeof(bt_addr_le_t);         /*##CASBfgs*/
+
+	return _buffer_size_max;                                                 /*##BWmN6G8*/
+
+}                                                                                /*##B9ELNqo*/
+
+void bt_le_adv_param_enc(CborEncoder *_encoder, struct bt_le_adv_param *_data)   /*####%BmQP*/
+{                                                                                /*#####@RZs*/
+
+	SERIALIZE(STRUCT(struct bt_le_adv_param));
+	SERIALIZE(NULLABLE(peer));
+
+	SERIALIZE(STRUCT_BUFFER_CONST(22));                                      /*##EzbvbRY*/
+
+	ser_encode_uint(_encoder, _data->id);                                    /*#######%A*/
+	ser_encode_uint(_encoder, _data->sid);                                   /*#######zA*/
+	ser_encode_uint(_encoder, _data->secondary_max_skip);                    /*########f*/
+	ser_encode_uint(_encoder, _data->options);                               /*########O*/
+	ser_encode_uint(_encoder, _data->interval_min);                          /*########T*/
+	ser_encode_uint(_encoder, _data->interval_max);                          /*########M*/
+	ser_encode_buffer(_encoder, &_data->peer, sizeof(bt_addr_le_t));         /*########@*/
+
+}                                                                                /*##B9ELNqo*/
+
+
+size_t bt_data_buf_size(struct bt_data *_data)                                   /*####%Bh+W*/
+{                                                                                /*#####@gQY*/
+
+	size_t _buffer_size_max = 0;                                             /*##AW2oACE*/
+
+	_buffer_size_max += sizeof(uint8_t) * _data->data_len;                   /*##CBQ2Maw*/
+
+	return _buffer_size_max;                                                 /*##BWmN6G8*/
+
+}                                                                                /*##B9ELNqo*/
+
+size_t bt_data_sp_size(struct bt_data *_data)                                    /*####%Bpd6*/
+{                                                                                /*#####@6Xk*/
+
+	size_t _scratchpad_size = 0;                                             /*##ATz5YrA*/
+
+	_scratchpad_size += sizeof(uint8_t) * _data->data_len;                   /*##EGHmw1o*/
+
+	return _scratchpad_size;                                                 /*##BRWAmyU*/
+
+}                                                                                /*##B9ELNqo*/
+
+void bt_data_enc(CborEncoder *_encoder, struct bt_data *_data)                      /*####%Brep*/
+{                                                                                   /*#####@Iq0*/
+
+	SERIALIZE(STRUCT(struct bt_data));
+	SERIALIZE(SIZE_PARAM(data, data_len));
+
+	SERIALIZE(STRUCT_BUFFER_CONST(9));                                          /*##E6pA5Eo*/
+
+	ser_encode_uint(_encoder, _data->type);                                     /*######%A8*/
+	ser_encode_uint(_encoder, _data->data_len);                                 /*######fsW*/
+	ser_encode_buffer(_encoder, _data->data, sizeof(uint8_t) * _data->data_len);/*######@EY*/
+
+}                                                                                   /*##B9ELNqo*/

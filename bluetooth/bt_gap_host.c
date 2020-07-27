@@ -465,3 +465,83 @@ decoding_error:                                                                 
 	SER_SCRATCHPAD_FREE(&_scratchpad);                                       /*#######oY*/
 }                                                                                /*########@*/
 
+
+/** LE Advertising Parameters. */
+struct bt_le_adv_param {
+	/** @brief Local identity.
+	 *
+	 *  @note When extended advertising :option:`CONFIG_BT_EXT_ADV` is not
+	 *        enabled or not supported by the controller it is not possible
+	 *        to scan and advertise simultaneously using two different
+	 *        random addresses.
+	 *
+	 *  @note It is not possible to have multiple connectable advertising
+	 *        sets advertising simultaneously using different identities.
+	 */
+	uint8_t  id;
+
+	/** @brief Advertising Set Identifier, valid range 0x00 - 0x0f.
+	 *
+	 *  @note Requires @ref BT_LE_ADV_OPT_EXT_ADV
+	 **/
+	uint8_t  sid;
+
+	/** @brief Secondary channel maximum skip count.
+	 *
+	 *  Maximum advertising events the advertiser can skip before it must
+	 *  send advertising data on the secondary advertising channel.
+	 *
+	 *  @note Requires @ref BT_LE_ADV_OPT_EXT_ADV
+	 */
+	uint8_t  secondary_max_skip;
+
+	/** Bit-field of advertising options */
+	uint32_t options;
+
+	/** Minimum Advertising Interval (N * 0.625) */
+	uint32_t interval_min;
+
+	/** Maximum Advertising Interval (N * 0.625) */
+	uint32_t interval_max;
+
+	/** @brief Directed advertising to peer
+	 *
+	 *  When this parameter is set the advertiser will send directed
+	 *  advertising to the remote device.
+	 *
+	 *  The advertising type will either be high duty cycle, or low duty
+	 *  cycle if the BT_LE_ADV_OPT_DIR_MODE_LOW_DUTY option is enabled.
+	 *
+	 *  In case of connectable high duty cycle if the connection could not
+	 *  be established within the timeout the connected() callback will be
+	 *  called with the status set to @ref BT_HCI_ERR_ADV_TIMEOUT.
+	 */
+	const bt_addr_le_t *peer;
+};
+
+void bt_le_adv_param_dec(struct ser_scratchpad *_scratchpad, struct bt_le_adv_param *_data)/*####%Bklr*/
+{                                                                                          /*#####@MEU*/
+
+	CborValue *_value = &_scratchpad->value;                                           /*##AS/0Pfc*/
+
+	_data->id = ser_decode_uint(_value);                                               /*#######%C*/
+	_data->sid = ser_decode_uint(_value);                                              /*#######uD*/
+	_data->secondary_max_skip = ser_decode_uint(_value);                               /*########8*/
+	_data->options = ser_decode_uint(_value);                                          /*########H*/
+	_data->interval_min = ser_decode_uint(_value);                                     /*########O*/
+	_data->interval_max = ser_decode_uint(_value);                                     /*########8*/
+	_data->peer = ser_decode_buffer_sp(_scratchpad);                                   /*########@*/
+
+}                                                                                          /*##B9ELNqo*/
+
+void bt_data_dec(struct ser_scratchpad *_scratchpad, struct bt_data *_data)      /*####%Bne5*/
+{                                                                                /*#####@+3g*/
+
+	CborValue *_value = &_scratchpad->value;                                 /*##AS/0Pfc*/
+
+	_data->type = ser_decode_uint(_value);                                   /*######%Ck*/
+	_data->data_len = ser_decode_uint(_value);                               /*######cDJ*/
+	_data->data = ser_decode_buffer_sp(_scratchpad);                         /*######@Vg*/
+
+}                                                                                /*##B9ELNqo*/
+
