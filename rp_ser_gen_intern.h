@@ -14,10 +14,12 @@
 #define _SERIALIZE_IGNORE_RETURN "__SERIALIZE__:IGNORE_RETURN"
 #define _SERIALIZE_CUSTOM_RESPONSE "__SERIALIZE__:CUSTOM_RESPONSE"
 #define _SERIALIZE_ADD(dir, type, name) "__SERIALIZE__:ADD=" #dir "`" #type "`" #name
+#define _SERIALIZE_DEL(name) "__SERIALIZE__:DEL=" #name
 #define _SERIALIZE_SIZE(param, size) "__SERIALIZE__:SIZE=" #param "`" #size
 #define _SERIALIZE_SIZE_PARAM(param, size_param) "__SERIALIZE__:SIZE_PARAM=" #param "`" #size_param
 #define _SERIALIZE_SIZE_PARAM_EX(param, size_pattern, size_param) "__SERIALIZE__:SIZE_PARAM_EX=" #param "`" #size_pattern "`" #size_param
 #define _SERIALIZE_NULLABLE(param) "__SERIALIZE__:NULLABLE=" #param
+#define _SERIALIZE_STRUCT_BUFFER_CONST(num) "__SERIALIZE__:STRUCT_BUFFER_CONST=" #num
 
 
 #define _SERIALIZE_GROUP(group) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
@@ -28,6 +30,8 @@
 #define _SERIALIZE_HOST_FILE(file) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:HOST_FILE=" file
 #define _SERIALIZE_RAW_STRUCT(type) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:RAW_STRUCT=" #type
 #define _SERIALIZE_STRUCT(type) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:STRUCT=" #type
+#define _SERIALIZE_OPAQUE_STRUCT(type) const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:OPAQUE_STRUCT=" #type
+
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
 

@@ -66,6 +66,13 @@ struct bt_le_ext_adv_scanned_info {
 	bt_addr_le_t *addr;
 };
 
+typedef void (*bt_le_ext_adv_cb_sent_t)(struct bt_le_ext_adv *adv,
+			struct bt_le_ext_adv_sent_info *info);
+typedef void (*bt_le_ext_adv_cb_connected_t)(struct bt_le_ext_adv *adv,
+			struct bt_le_ext_adv_connected_info *info);
+typedef void (*bt_le_ext_adv_cb_scanned_t)(struct bt_le_ext_adv *adv,
+			struct bt_le_ext_adv_scanned_info *info);
+
 struct bt_le_ext_adv_cb {
 	/** @brief The advertising set has finished sending adv data.
 	 *
@@ -77,8 +84,7 @@ struct bt_le_ext_adv_cb {
 	 *  @param adv  The advertising set object.
 	 *  @param info Information about the sent event.
 	 */
-	void (*sent)(struct bt_le_ext_adv *adv,
-		     struct bt_le_ext_adv_sent_info *info);
+	bt_le_ext_adv_cb_sent_t sent;
 
 	/** @brief The advertising set has accepted a new connection.
 	 *
@@ -88,8 +94,7 @@ struct bt_le_ext_adv_cb {
 	 *  @param adv  The advertising set object.
 	 *  @param info Information about the connected event.
 	 */
-	void (*connected)(struct bt_le_ext_adv *adv,
-			  struct bt_le_ext_adv_connected_info *info);
+	bt_le_ext_adv_cb_connected_t connected;
 
 	/** @brief The advertising set has sent scan response data.
 	 *
@@ -100,8 +105,7 @@ struct bt_le_ext_adv_cb {
 	 *  @param adv  The advertising set object.
 	 *  @param addr Information about the scanned event.
 	 */
-	void (*scanned)(struct bt_le_ext_adv *adv,
-			struct bt_le_ext_adv_scanned_info *info);
+	bt_le_ext_adv_cb_scanned_t scanned;
 };
 
 /** @typedef bt_ready_cb_t
@@ -772,7 +776,7 @@ int bt_le_ext_adv_get_info(const struct bt_le_ext_adv *adv,
  *  @param adv_type Type of advertising response from advertiser.
  *  @param buf Buffer containing advertiser data.
  */
-typedef void bt_le_scan_cb_t(const bt_addr_le_t *addr, s8_t rssi,
+typedef void (*bt_le_scan_cb_t)(const bt_addr_le_t *addr, s8_t rssi,
 			     uint8_t adv_type, struct net_buf_simple *buf);
 
 enum {
@@ -813,13 +817,8 @@ struct bt_le_scan_param {
 	/** Scan type (BT_LE_SCAN_TYPE_ACTIVE or BT_LE_SCAN_TYPE_PASSIVE) */
 	uint8_t  type;
 
-	union {
-		/** Bit-field of scanning filter options. */
-		uint32_t filter_dup __deprecated;
-
-		/** Bit-field of scanning options. */
-		uint32_t options;
-	};
+	/** Bit-field of scanning options. */
+	uint32_t options;
 
 	/** Scan interval (N * 0.625 ms) */
 	uint16_t interval;
