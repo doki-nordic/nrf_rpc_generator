@@ -1,16 +1,17 @@
+require('./lib/Polyfill').exec();
 
-if (!('fromEntries' in Object)) {
-	Object.fromEntries = arr => Object.assign({}, ...Array.from(arr, ([k, v]) => ({ [k]: v })));
+const Options = require('./lib/Options');
+const Units = require('./lib/Units');
+const fs = require('fs');
+
+try {
+	Options.parseParams();
+	Options.loadConfig();
+	let mod = new Units.Module();
+	mod.execute();
+	mod.save();
+} finally {
+	if (Options.options.tmpDir !== null) {
+		//TODO: fs.rmdirSync(Options.options.tmpDir, { recursive: true });
+	}
 }
-
-const { writeFileSync } = require('fs');
-const Parser = require('./lib/Parsing');
-const CodeBlocks = require('./lib/CodeBlocks');
-const NrfRpcCborGenerator = require('./lib/NrfRpcCborGenerator');
-const { findRecursive } = require('./lib/Utils');
-const { parse } = require('path');
-const Units = require('./lib/Units')
-
-let mod = new Units.Module('bluetooth/bt_gap_cli.c');
-mod.execute();
-mod.save();

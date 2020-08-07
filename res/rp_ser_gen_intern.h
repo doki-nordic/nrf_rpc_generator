@@ -26,11 +26,7 @@
 
 
 #define _SERIALIZE_GROUP(group) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
-#define _SERIALIZE_CMD_ID(prefix, postfix) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CMD_ID=" #prefix "$" #postfix
-#define _SERIALIZE_EVT_ID(prefix, postfix) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:EVT_ID=" #prefix "$" #postfix
 #define _SERIALIZE_FUNC(name) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FUNC=" #name
-#define _SERIALIZE_CLI_FILE(file) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:CLI_FILE=" file
-#define _SERIALIZE_HOST_FILE(file) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:HOST_FILE=" file
 #define _SERIALIZE_RAW_STRUCT(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:RAW_STRUCT=" #type
 #define _SERIALIZE_OPAQUE_STRUCT(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:OPAQUE_STRUCT=" #type
 #define _SERIALIZE_STRUCT_BUFFER_CONST(enc, num) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:STRUCT_BUFFER_CONST=" #enc "`" #num
