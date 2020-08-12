@@ -23,13 +23,15 @@
 #define _SERIALIZE_CALLBACK(type) "__SERIALIZE__:CALLBACK=" #type
 #define _SERIALIZE_STRUCT(type) "__SERIALIZE__:STRUCT=" #type
 #define _SERIALIZE_CUSTOM_STRUCT(type) "__SERIALIZE__:CUSTOM_STRUCT=" #type
+#define _SERIALIZE_CUSTOM_EXECUTE "__SERIALIZE__:CUSTOM_EXECUTE"
 
 
 #define _SERIALIZE_GROUP(group) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
 #define _SERIALIZE_FUNC(name) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FUNC=" #name
 #define _SERIALIZE_RAW_STRUCT(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:RAW_STRUCT=" #type
 #define _SERIALIZE_OPAQUE_STRUCT(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:OPAQUE_STRUCT=" #type
-#define _SERIALIZE_STRUCT_BUFFER_CONST(enc, num) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:STRUCT_BUFFER_CONST=" #enc "`" #num
+#define _SERIALIZE_FILTERED_STRUCT(type, buf_size, encoder, decoder) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FILTERED_STRUCT=" #type "`" #buf_size "`" #encoder "`" #decoder
+//#define _SERIALIZE_STRUCT_BUFFER_CONST(enc, num) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:STRUCT_BUFFER_CONST=" #enc "`" #num
 
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
