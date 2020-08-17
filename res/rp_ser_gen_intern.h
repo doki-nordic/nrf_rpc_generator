@@ -31,7 +31,8 @@
 #define _SERIALIZE_RAW_STRUCT(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:RAW_STRUCT=" #type
 #define _SERIALIZE_OPAQUE_STRUCT(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:OPAQUE_STRUCT=" #type
 #define _SERIALIZE_FILTERED_STRUCT(type, buf_size, encoder, decoder) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FILTERED_STRUCT=" #type "`" #buf_size "`" #encoder "`" #decoder
-//#define _SERIALIZE_STRUCT_BUFFER_CONST(enc, num) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:STRUCT_BUFFER_CONST=" #enc "`" #num
+#define _SERIALIZE_ENUM(type) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:ENUM=" #type
+#define _SERIALIZE_FIELD_TYPE(struct, type, name) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:FIELD_TYPE=" #struct "`" #type "`" #name
 
 
 #define SERIALIZE(...) _SERIALIZE_ ## __VA_ARGS__
