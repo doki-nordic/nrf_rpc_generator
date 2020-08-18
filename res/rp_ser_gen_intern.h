@@ -25,6 +25,7 @@
 #define _SERIALIZE_CUSTOM_STRUCT(type) "__SERIALIZE__:CUSTOM_STRUCT=" #type
 #define _SERIALIZE_CUSTOM_EXECUTE "__SERIALIZE__:CUSTOM_EXECUTE"
 #define _SERIALIZE_TYPE(param, type) "__SERIALIZE__:TYPE=" #param "`" #type
+#define _SERIALIZE_UNION_SELECT(field) "__SERIALIZE__:UNION_SELECT=" #field
 
 
 #define _SERIALIZE_GROUP(group) static const char* _SERIALIZE__UNIQUE() = "__SERIALIZE__:GROUP=" #group
