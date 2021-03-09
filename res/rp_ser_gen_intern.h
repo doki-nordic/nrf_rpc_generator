@@ -6,6 +6,7 @@
 #define _SERIALIZE__UNIQUE() _SERIALIZE__CONCAT(_serialize_unique_, __COUNTER__, __LINE__)
 
 #define _SERIALIZE_ "__SERIALIZE__:USE"
+#define _SERIALIZE_IGNORE "__SERIALIZE__IGNORE__"
 #define _SERIALIZE_OUT(x) "__SERIALIZE__:OUT=" #x
 #define _SERIALIZE_INOUT(x) "__SERIALIZE__:INOUT=" #x
 #define _SERIALIZE_STR(x) "__SERIALIZE__:STR=" #x
